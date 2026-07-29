@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>구장예약현황</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --primary-border: #bfdbfe;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --danger-border: #fecaca;
+            --gray-bg: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { padding: 16px 10px; background-color: #f1f5f9; color: var(--text-dark); }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 16px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        /* HEADER & TITLE */
+        .header { margin-bottom: 20px; text-align: center; }
+        .main-title { 
+            display: inline-block; 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: var(--text-dark); 
+            letter-spacing: -0.5px;
+            position: relative;
+            padding-bottom: 6px;
+        }
+        .main-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 36px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* FORM CARDS CONTAINER (PC: 2열 / 모바일: 1열) */
+        .forms-wrapper { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 20px; }
+        @media (min-width: 768px) {
+            body { padding: 30px 20px; }
+            .container { padding: 32px; }
+            .main-title { font-size: 26px; }
+            .forms-wrapper { grid-template-columns: 1fr 1fr; gap: 20px; }
+        }
+
+        .form-card { 
+            border-radius: 12px; 
+            padding: 16px; 
+            position: relative; 
+            background: #ffffff; 
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .form-card.create { border-top: 4px solid var(--primary); background: var(--primary-light); }
+        .form-card.edit { border-top: 4px solid var(--danger); background: var(--danger-light); }
+
+        .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .form-title { font-weight: 700; font-size: 16px; }
+        .form-card.create .form-title { color: var(--primary); }
+        .form-card.edit .form-title { color: var(--danger); }
+
+        .selected-day-badge { 
+            background: var(--primary); 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 12px; 
+            font-size: 11px; 
+            font-weight: 600;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 70px 1fr; gap: 8px; align-items: center; font-size: 13px; }
+        .form-grid label { font-weight: 600; color: #475569; }
+        .form-grid select, .form-grid input { 
+            padding: 8px 10px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 6px; 
+            outline: none; 
+            width: 100%; 
+            background: white; 
+            font-size: 14px; /* 모바일 아이폰 자동 확대 방지 (16px 권장되나 14px+viewport 적용) */
+        }
+
+        .btn-group { display: flex; gap: 6px; }
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; color: white; font-size: 13px; }
+        .btn-blue { background: var(--primary); }
+        .btn-red { background: var(--danger); }
+        .btn-gray { background: #64748b; }
+
+        /* NOTICE ACCORDION */
+        .notice-details {
+            background: var(--gray-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .notice-summary {
+            padding: 12px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 13px;
+        }
+        .notice-summary::after { content: '▼'; font-size: 10px; color: var(--text-muted); transition: transform 0.2s; }
+        .notice-details[open] .notice-summary::after { transform: rotate(180deg); }
+        .notice-content {
+            padding: 14px 16px;
+            background: #ffffff;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #475569;
+            border-top: 1px solid var(--border);
+        }
+        .notice-content ul { padding-left: 16px; margin-top: 4px; }
+
+        /* STADIUM TABS */
+        .tabs { display: flex; gap: 4px; margin-bottom: -1px; }
+        .tab-btn { 
+            flex: 1; /* 모바일에서 탭 균등 분배 */
+            padding: 10px 0; 
+            border: 1px solid var(--border); 
+            background: #f1f5f9; 
+            font-weight: 600; 
+            color: var(--text-muted);
+            cursor: pointer; 
+            border-radius: 8px 8px 0 0; 
+            font-size: 13px;
+            text-align: center;
+        }
+        @media (min-width: 768px) {
+            .tab-btn { flex: initial; padding: 10px 24px; }
+        }
+        .tab-btn.active { 
+            background: var(--primary); 
+            color: white; 
+            border-color: var(--primary); 
+        }
+
+        /* TIMETABLE GRID (모바일 터치 스크롤 패닝 적용) */
+        .timetable-container { 
+            overflow-x: auto; 
+            border: 1px solid var(--border); 
+            border-radius: 0 0 12px 12px; 
+            -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+        }
+        .timetable { width: 100%; min-width: 650px; border-collapse: collapse; text-align: center; }
+        .timetable th, .timetable td { border: 1px solid var(--border); padding: 6px; font-size: 12px; }
+        .timetable th { background: #f8fafc; font-weight: 600; }
+        
+        .day-header-btn {
+            display: block;
+            width: 100%;
+            padding: 6px 0;
+            background: #ffffff;
+            color: var(--text-dark);
+            font-weight: 700;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .day-header-btn:active { background: var(--primary); color: white; }
+        .day-header-btn span {
+            display: block;
+            font-size: 9px;
+            font-weight: normal;
+            opacity: 0.8;
+        }
+
+        .time-col { width: 60px; min-width: 60px; background: #f8fafc; font-weight: 700; color: var(--text-muted); }
+
+        /* RESERVATION CELL */
+        .cell-content { min-height: 48px; display: flex; flex-direction: column; gap: 3px; justify-content: center; }
+        .user-tag { 
+            background: var(--primary-light); 
+            color: #1d4ed8; 
+            border: 1px solid var(--primary-border); 
+            border-radius: 4px; 
+            padding: 4px; 
+            font-size: 11px; 
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .user-tag.selected { 
+            background: #fee2e2; 
+            color: #991b1b; 
+            border-color: #fca5a5; 
+        }
+        .lesson-tag { background: #f1f5f9; color: #475569; font-weight: 700; padding: 4px; border-radius: 4px; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <h1 class="main-title">구장예약현황</h1>
+    </div>
+
+    <!-- FORM BOARDS -->
+    <div class="forms-wrapper">
+        <!-- [신규] 입력 폼 -->
+        <div class="form-card create">
+            <div class="form-header">
+                <div>
+                    <span class="form-title">[신규]</span>
+                    <span id="selected-day-display" class="selected-day-badge">월요일</span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-blue">저장</button>
+                </div>
+            </div>
+            <div class="form-grid">
+                <label>선택요일</label>
+                <select id="create-day">
+                    <option value="월">월요일</option>
+                    <option value="화">화요일</option>
+                    <option value="수">수요일</option>
+                    <option value="목">목요일</option>
+                    <option value="금">금요일</option>
+                    <option value="토">토요일</option>
+                    <option value="일">일요일</option>
+                </select>
+                <label>시작시간</label>
+                <select id="create-start">
+                    <option>17:00</option><option>18:00</option><option>19:00</option>
+                </select>
+                <label>종료시간</label>
+                <select id="create-end">
+                    <option>18:00</option><option>19:00</option><option>20:00</option>
+                </select>
+                <label>ID</label>
+                <input type="tel" placeholder="전화번호 입력 (- 제외)">
+                <label>PW</label>
+                <input type="password" placeholder="비밀번호 입력">
+            </div>
+        </div>
+
+        <!-- [수정] 입력 폼 -->
+        <div class="form-card edit">
+            <div class="form-header">
+                <span class="form-title">[수정]</span>
+                <div class="btn-group">
+                    <button class="btn btn-gray">삭제</button>
+                    <button class="btn btn-red">수정</button>
+                </div>
+            </div>
+            <div class="form-grid">
+                <label>시작시간</label>
+                <select id="edit-start" disabled>
+                    <option>17:00</option>
+                </select>
+                <label>종료시간</label>
+                <select id="edit-end">
+                    <option>19:00</option>
+                </select>
+                <label>ID</label>
+                <input type="text" value="B회원 (010-1234-5678)" readonly>
+                <label>PW</label>
+                <input type="password" placeholder="비밀번호 확인">
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTICE ACCORDION -->
+    <details class="notice-details">
+        <summary class="notice-summary">
+            📢 공지사항 (터치하여 접기/펼치기)
+        </summary>
+        <div class="notice-content">
+            <strong>구장 이용 수칙 및 예약 안내</strong>
+            <ul>
+                <li>예약 취소 및 변경은 이용 1일 전까지만 가능합니다.</li>
+                <li>구장 내 음식물 반입 및 취사는 엄격히 금지됩니다.</li>
+                <li>원하는 요일 버튼을 터치하면 해당 요일의 신규 예약을 바로 시작할 수 있습니다.</li>
+            </ul>
+        </div>
+    </details>
+
+    <!-- STADIUM TABS -->
+    <div class="tabs">
+        <button class="tab-btn active">구장1</button>
+        <button class="tab-btn">구장2</button>
+        <button class="tab-btn">구장3</button>
+    </div>
+
+    <!-- TIMETABLE -->
+    <div class="timetable-container">
+        <table class="timetable">
+            <thead>
+                <tr>
+                    <th class="time-col"></th>
+                    <th><button class="day-header-btn" onclick="selectDay('월')">월 <span>+신규</span></button></th>
+                    <th><button class="day-header-btn" onclick="selectDay('화')">화 <span>+신규</span></button></th>
+                    <th><button class="day-header-btn" onclick="selectDay('수')">수 <span>+신규</span></button></th>
+                    <th><button class="day-header-btn" onclick="selectDay('목')">목 <span>+신규</span></button></th>
+                    <th><button class="day-header-btn" onclick="selectDay('금')">금 <span>+신규</span></button></th>
+                    <th><button class="day-header-btn" onclick="selectDay('토')">토 <span>+신규</span></button></th>
+                    <th><button class="day-header-btn" onclick="selectDay('일')">일 <span>+신규</span></button></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="time-col">17:00</td>
+                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">B회원</span></div></td>
+                    <td><div class="cell-content"><span class="user-tag">B회원</span><span class="user-tag">C회원</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"><span class="user-tag selected">B회원</span><span class="user-tag">C회원</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">18:00</td>
+                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">B회원</span></div></td>
+                    <td><div class="cell-content"><span class="user-tag">B회원</span><span class="user-tag">C회원</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">19:00</td>
+                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">C회원</span><span class="user-tag">D회원</span></div></td>
+                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">20:00</td>
+                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">C회원</span><span class="user-tag">D회원</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                </tr>
+                <tr>
+                    <td class="time-col">21:00</td>
+                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">C회원</span><span class="user-tag">D회원</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                </tr>
+				                <tr>
+                    <td class="time-col">22:00</td>
+                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">C회원</span><span class="user-tag">D회원</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                </tr>
+                </tr>
+				<tr>
+                    <td class="time-col">23:00</td>
+                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">C회원</span><span class="user-tag">D회원</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                    <td><div class="cell-content"></div></td>
+                </tr>				
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function selectDay(dayName) {
+        const daySelect = document.getElementById('create-day');
+        if (daySelect) daySelect.value = dayName;
+
+        const badge = document.getElementById('selected-day-display');
+        if (badge) badge.innerText = dayName + '요일';
+
+        document.querySelector('.form-card.create').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

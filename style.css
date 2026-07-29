@@ -1,0 +1,274 @@
+:root {
+    --primary: #2563eb;
+    --primary-light: #eff6ff;
+    --primary-border: #bfdbfe;
+    --danger: #ef4444;
+    --danger-light: #fef2f2;
+    --danger-border: #fecaca;
+    --gray-bg: #f8fafc;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+}
+
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Pretendard', -apple-system, sans-serif; 
+    -webkit-tap-highlight-color: transparent; 
+}
+
+body { 
+    padding: 10px 4px; 
+    background-color: #f1f5f9; 
+    color: var(--text-dark); 
+    display: flex;
+    justify-content: center;
+}
+
+/* 전체 컨테이너 */
+.container { 
+    width: 100%;
+    max-width: 400px; 
+    margin: 0 auto; 
+    background: white; 
+    padding: 10px 6px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    transition: max-width 0.3s ease, padding 0.3s ease;
+}
+
+/* HEADER & TITLE */
+.header { margin-bottom: 12px; text-align: center; }
+.main-title { 
+    display: inline-block; 
+    font-size: 19px; 
+    font-weight: 800; 
+    color: var(--text-dark); 
+    letter-spacing: -0.5px;
+    position: relative;
+    padding-bottom: 4px;
+}
+.main-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+/* NOTICE ACCORDION */
+.notice-details {
+    background: var(--gray-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+.notice-summary {
+    padding: 8px 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 11.5px;
+}
+.notice-summary::after { content: '▼'; font-size: 8px; color: var(--text-muted); transition: transform 0.2s; }
+.notice-details[open] .notice-summary::after { transform: rotate(180deg); }
+.notice-content {
+    padding: 10px;
+    background: #ffffff;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #475569;
+    border-top: 1px solid var(--border);
+}
+.notice-content ul { padding-left: 12px; margin-top: 2px; }
+
+/* STADIUM TABS */
+.tabs { display: flex; gap: 2px; margin-bottom: -1px; }
+.tab-btn { 
+    flex: 1; 
+    padding: 7px 0; 
+    border: 1px solid var(--border); 
+    background: #f1f5f9; 
+    font-weight: 600; 
+    color: var(--text-muted);
+    cursor: pointer; 
+    border-radius: 6px 6px 0 0; 
+    font-size: 12px;
+    text-align: center;
+}
+.tab-btn.active { 
+    background: var(--primary); 
+    color: white; 
+    border-color: var(--primary); 
+}
+
+/* TIMETABLE GRID (모바일 셀 보정) */
+.timetable-container { 
+    width: 100%;
+    overflow-x: auto; 
+    border: 1px solid var(--border); 
+    border-radius: 0 0 8px 8px; 
+    -webkit-overflow-scrolling: touch; 
+}
+.timetable { 
+    width: 100%; 
+    table-layout: fixed; 
+    border-collapse: collapse; 
+    text-align: center; 
+}
+.timetable th, .timetable td { 
+    border: 1px solid var(--border); 
+    padding: 2px 0; 
+    font-size: 10px; 
+    word-break: break-all;
+}
+.timetable th { background: #f8fafc; font-weight: 600; }
+
+/* 요일 헤더 버튼 (넘침 방지 스타일 보정) */
+.day-header-btn {
+    display: block;
+    width: 100%;
+    padding: 3px 0;
+    background: #ffffff;
+    color: var(--text-dark);
+    font-weight: 700;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 9.5px; /* 글자 크기 축소 */
+    line-height: 1.15;
+    letter-spacing: -0.3px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.day-header-btn:active { background: var(--primary); color: white; }
+.day-header-btn span {
+    display: block;
+    font-size: 8px;
+    font-weight: normal;
+    opacity: 0.85;
+    margin-top: 1px;
+}
+
+/* 시간 컬럼 크기 보정 */
+.time-col { 
+    width: 38px; 
+    background: #f8fafc; 
+    font-weight: 700; 
+    color: var(--text-muted); 
+    font-size: 9.5px !important;
+}
+
+/* RESERVATION CELL & TAGS */
+.cell-content { 
+    min-height: 36px; 
+    display: flex; 
+    flex-direction: column;
+    gap: 2px; 
+    justify-content: center; 
+    align-items: center;
+}
+.user-tag { 
+    background: var(--primary-light); 
+    color: #1d4ed8; 
+    border: 1px solid var(--primary-border); 
+    border-radius: 3px; 
+    padding: 1px 2px; 
+    font-size: 9px; 
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1.1;
+    word-break: keep-all;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.lesson-tag { 
+    background: #f1f5f9; 
+    color: #475569; 
+    font-weight: 700; 
+    padding: 1px 2px; 
+    border-radius: 3px; 
+    font-size: 9px; 
+}
+
+/* MODAL STYLES */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-card {
+    background: white;
+    width: 100%;
+    max-width: 350px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    transform: translateY(10px);
+    transition: transform 0.2s ease;
+}
+.modal-overlay.active .modal-card { transform: translateY(0); }
+.modal-card.create { border-top: 4px solid var(--primary); }
+.modal-card.edit { border-top: 4px solid var(--danger); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.modal-title { font-size: 14px; font-weight: 700; }
+.modal-card.create .modal-title { color: var(--primary); }
+.modal-card.edit .modal-title { color: var(--danger); }
+.close-btn { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; line-height: 1; }
+.modal-body { padding: 14px; }
+.selected-day-badge { background: var(--primary); color: white; padding: 2px 5px; border-radius: 10px; font-size: 9.5px; font-weight: 600; margin-left: 2px; }
+.form-grid { display: grid; grid-template-columns: 55px 1fr; gap: 8px; align-items: center; font-size: 12px; }
+.form-grid label { font-weight: 600; color: #475569; }
+.form-grid select, .form-grid input { padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; width: 100%; background: white; font-size: 13px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 6px; padding: 10px 14px; background: #f8fafc; border-top: 1px solid var(--border); }
+.btn { padding: 6px 12px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; color: white; font-size: 12px; }
+.btn-blue { background: var(--primary); }
+.btn-red { background: var(--danger); }
+.btn-gray { background: #cbd5e1; color: #334155; }
+.btn-gray-dark { background: #64748b; }
+
+/* PC / 태블릿 확장 (768px 이상) */
+@media (min-width: 768px) {
+    body { padding: 30px 20px; }
+    .container { max-width: 800px; padding: 24px; border-radius: 16px; }
+    .main-title { font-size: 24px; }
+    .main-title::after { width: 40px; height: 4px; }
+    .notice-summary { padding: 12px 18px; font-size: 14px; }
+    .notice-content { padding: 14px 18px; font-size: 13px; }
+    .tab-btn { padding: 12px 0; font-size: 14px; border-radius: 8px 8px 0 0; }
+    .timetable th, .timetable td { padding: 6px 4px; }
+    .day-header-btn { padding: 8px 0; font-size: 12px; letter-spacing: 0; }
+    .day-header-btn span { font-size: 10px; }
+    .time-col { width: 65px; font-size: 12px !important; }
+    .cell-content { min-height: 52px; gap: 3px; }
+    .user-tag, .lesson-tag { padding: 3px 6px; font-size: 11px; border-radius: 4px; }
+    .modal-card { max-width: 420px; }
+    .modal-title { font-size: 17px; }
+    .form-grid { grid-template-columns: 75px 1fr; gap: 10px; font-size: 13px; }
+    .btn { padding: 8px 16px; font-size: 13px; }
+}
