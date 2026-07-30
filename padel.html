@@ -29,174 +29,87 @@
         </div>
     </details>
 
-    <!-- STADIUM TABS -->
+    <!-- STADIUM TABS (4개 구장으로 변경) -->
     <div class="tabs">
-        <button class="tab-btn active">구장1</button>
-        <button class="tab-btn">구장2</button>
-        <button class="tab-btn">구장3</button>
+        <button class="tab-btn active">실내</button>
+        <button class="tab-btn">야외1</button>
+        <button class="tab-btn">야외2</button>
+        <button class="tab-btn">야외3</button>
+    </div>
+
+    <!-- TIME FILTER BUTTONS -->
+    <div class="time-filter-container">
+        <button class="filter-btn active" onclick="filterTime('all', this)">전체</button>
+        <button class="filter-btn" onclick="filterTime('morning', this)">🌅 오전 (06~11시)</button>
+        <button class="filter-btn" onclick="filterTime('afternoon', this)">☀️ 오후 (12~17시)</button>
+        <button class="filter-btn" onclick="filterTime('night', this)">🌙 야간 (18~23시)</button>
     </div>
 
     <!-- TIMETABLE -->
-	<!--
     <div class="timetable-container">
         <table class="timetable">
-			<thead>
-				<tr>
-					<th class="time-col"></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-				</tr>
-			</thead>
-            <tbody>
+            <thead>
                 <tr>
-                    <td class="time-col">17:00</td>
-                    <td><div class="cell-content"><span class="user-tag" onclick="openEditModal('A회원', '17:00', '18:00')">A회원</span><span class="user-tag" onclick="openEditModal('B회원', '17:00', '19:00')">B회원</span></div></td>
-                    <td><div class="cell-content"><span class="user-tag" onclick="openEditModal('B회원', '17:00', '19:00')">B회원</span><span class="user-tag" onclick="openEditModal('C회원', '17:00', '18:00')">C회원</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"><span class="user-tag" onclick="openEditModal('B회원', '17:00', '19:00')">B회원</span><span class="user-tag" onclick="openEditModal('C회원', '17:00', '18:00')">C회원</span></div></td>
-                    <td><div class="cell-content"></div></td>
+                    <th class="time-col"></th>
+                    <th><button class="day-header-btn"></button></th>
+                    <th><button class="day-header-btn"></button></th>
+                    <th><button class="day-header-btn"></button></th>
+                    <th><button class="day-header-btn"></button></th>
+                    <th><button class="day-header-btn"></button></th>
+                    <th><button class="day-header-btn"></button></th>
+                    <th><button class="day-header-btn"></button></th>
                 </tr>
-                <tr>
-                    <td class="time-col">18:00</td>
-                    <td><div class="cell-content"><span class="user-tag" onclick="openEditModal('A회원', '17:00', '18:00')">A회원</span><span class="user-tag" onclick="openEditModal('B회원', '17:00', '19:00')">B회원</span></div></td>
-                    <td><div class="cell-content"><span class="user-tag" onclick="openEditModal('B회원', '17:00', '19:00')">B회원</span><span class="user-tag" onclick="openEditModal('C회원', '17:00', '18:00')">C회원</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                </tr>
-                <tr>
-                    <td class="time-col">19:00</td>
-                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">C회원</span><span class="user-tag">D회원</span></div></td>
-                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                </tr>
-                <tr>
-                    <td class="time-col">20:00</td>
-                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">C회원</span><span class="user-tag">D회원</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                </tr>
-                <tr>
-                    <td class="time-col">21:00</td>
-                    <td><div class="cell-content"><span class="user-tag">A회원</span><span class="user-tag">C회원</span><span class="user-tag">D회원</span></div></td>
-                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                </tr>
-                <tr>
-                    <td class="time-col">22:00</td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                </tr>	
-				<tr>
-                    <td class="time-col">23:00</td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"><span class="lesson-tag">강습</span></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                    <td><div class="cell-content"></div></td>
-                </tr>
+            </thead>
+            <tbody id="timetable-body">
             </tbody>
         </table>
     </div>
-	-->
-	<!-- TIMETABLE -->
-	<div class="timetable-container">
-		<table class="timetable">
-			<thead>
-				<tr>
-					<th class="time-col"></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-					<th><button class="day-header-btn"></button></th>
-				</tr>
-			</thead>
-			<!-- script.js에서 선택된 구장에 맞게 동적으로 그려지는 영역 -->
-			<tbody id="timetable-body">
-			</tbody>
-		</table>
-	</div>	
 </div>
 
-<!-- ==================== MODALS ==================== -->
-
-<!-- 1. [신규] 예약 모달 -->
+<!-- MODALS -->
 <div id="modal-create" class="modal-overlay">
     <div class="modal-card create">
         <div class="modal-header">
             <div>
                 <span class="modal-title">[신규 예약]</span>
-                <!-- 선택된 구장 표시 뱃지 추가 -->
-                <span id="create-stadium-badge" class="selected-day-badge" style="background:#64748b;">구장1</span>
+                <span id="create-stadium-badge" class="selected-day-badge" style="background:#64748b;">실내</span>
                 <span id="create-day-badge" class="selected-day-badge">07/29(수)</span>
             </div>
             <button class="close-btn" onclick="closeModal('modal-create')">&times;</button>
         </div>
         <div class="modal-body">
             <div class="form-grid">
-                <label for="create-day">선택요일</label>
-                <select id="create-day" onchange="updateBadge(this.value)">
-                    <option value="월">월요일</option>
-                    <option value="화">화요일</option>
-                    <option value="수">수요일</option>
-                    <option value="목">목요일</option>
-                    <option value="금">금요일</option>
-                    <option value="토">토요일</option>
-                    <option value="일">일요일</option>
-                </select>
+                <label for="create-day">선택일자</label>
+                <select id="create-day"></select>
+                
                 <label for="create-start">시작시간</label>
-                <select id="create-start">
-                    <option>17:00</option><option>18:00</option><option>19:00</option>
-                </select>
+                <select id="create-start"></select>
+                
                 <label for="create-end">종료시간</label>
-                <select id="create-end">
-                    <option>18:00</option><option>19:00</option><option>20:00</option>
-                </select>
+                <select id="create-end"></select>
+                
                 <label for="create-id">ID</label>
                 <input type="tel" id="create-id" placeholder="전화번호 입력 (- 제외)">
+                
                 <label for="create-pw">PW</label>
-                <input type="password" id="create-pw" placeholder="비밀번호 입력">
+                <div class="password-wrapper">
+                    <input type="password" id="create-pw" placeholder="비밀번호 입력">
+                    <button type="button" class="pw-toggle-btn" onclick="togglePasswordVisibility('create-pw', this)">👁️</button>
+                </div>
+            </div>
+
+            <div class="agreement-box">
+                <input type="checkbox" id="create-agree">
+                <label for="create-agree">[필수] 구장 이용 수칙 및 개인정보 이용에 동의합니다.</label>
             </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-gray" onclick="closeModal('modal-create')">취소</button>
-            <button class="btn btn-blue">저장</button>
+            <button class="btn btn-blue" onclick="submitCreate()">저장</button>
         </div>
     </div>
 </div>
 
-<!-- 2. [수정/삭제] 예약 모달 -->
 <div id="modal-edit" class="modal-overlay">
     <div class="modal-card edit">
         <div class="modal-header">
@@ -216,16 +129,21 @@
                 <label for="edit-id">ID</label>
                 <input type="text" id="edit-id" value="" readonly>
                 <label for="edit-pw">PW</label>
-                <input type="password" id="edit-pw" placeholder="비밀번호 확인">
+                <div class="password-wrapper">
+                    <input type="password" id="edit-pw" placeholder="비밀번호 확인">
+                    <button type="button" class="pw-toggle-btn" onclick="togglePasswordVisibility('edit-pw', this)">👁️</button>
+                </div>
             </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-gray" onclick="closeModal('modal-edit')">닫기</button>
-            <button class="btn btn-gray-dark">삭제</button>
-            <button class="btn btn-red">수정</button>
+            <button class="btn btn-gray-dark" onclick="submitDelete()">삭제</button>
+            <button class="btn btn-red" onclick="submitEdit()">수정</button>
         </div>
     </div>
 </div>
+
+<div id="toast-message" class="toast">✓ 처리되었습니다.</div>
 
 <script src="script.js"></script>
 </body>
