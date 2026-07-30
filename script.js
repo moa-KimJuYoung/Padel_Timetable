@@ -1,10 +1,16 @@
-// 전역 변수: 현재 선택된 구장명 및 일주일 날짜 정보
-let currentStadium = '구장1';
+let currentStadium = '실내';
+let currentTimeFilter = 'all'; // 'all', 'morning', 'afternoon', 'night'
 let weekDates = [];
 
-// [예시 데이터] 12시부터 23시까지의 구장별 mock 데이터
+// [예시 데이터] 실내, 야외1, 야외2, 야외3 4개 구장 매핑
 const stadiumData = {
-    '구장1': {
+    '실내': {
+        '06:00': [[{ name: '실내조기회', type: 'user' }], [], [], [], [], [], []],
+        '07:00': [[{ name: '실내조기회', type: 'user' }], [], [], [], [], [], []],
+        '08:00': [[], [], [], [], [], [], []],
+        '09:00': [[], [{ name: '모닝레슨', type: 'lesson' }], [], [], [], [], []],
+        '10:00': [[], [{ name: '모닝레슨', type: 'lesson' }], [], [], [], [], []],
+        '11:00': [[], [], [], [], [], [], []],
         '12:00': [[{ name: '점심팀', type: 'user' }], [], [], [], [], [], []],
         '13:00': [[], [], [{ name: '직장인A', type: 'user' }], [], [], [], []],
         '14:00': [[], [], [], [], [], [{ name: '주말클럽', type: 'user' }], []],
@@ -18,7 +24,13 @@ const stadiumData = {
         '22:00': [[], [], [{ name: '심야클럽', type: 'user' }], [], [{ name: '불금팀', type: 'user' }], [], []],
         '23:00': [[], [], [], [], [], [], []]
     },
-    '구장2': {
+    '야외1': {
+        '06:00': [[], [], [], [], [], [], []],
+        '07:00': [[], [], [], [], [], [], []],
+        '08:00': [[], [], [], [], [], [], []],
+        '09:00': [[], [], [], [], [], [], []],
+        '10:00': [[{ name: '시니어반', type: 'lesson' }], [], [{ name: '시니어반', type: 'lesson' }], [], [], [], []],
+        '11:00': [[{ name: '시니어반', type: 'lesson' }], [], [{ name: '시니어반', type: 'lesson' }], [], [], [], []],
         '12:00': [[], [], [], [], [], [], []],
         '13:00': [[], [], [], [], [], [], []],
         '14:00': [[], [{ name: '오후반', type: 'lesson' }], [], [{ name: '오후반', type: 'lesson' }], [], [], []],
@@ -32,7 +44,13 @@ const stadiumData = {
         '22:00': [[], [], [], [{ name: '나이트팀', type: 'user' }], [], [], []],
         '23:00': [[], [], [], [], [], [], []]
     },
-    '구장3': {
+    '야외2': {
+        '06:00': [[], [], [], [], [], [], []],
+        '07:00': [[], [], [], [], [], [], []],
+        '08:00': [[], [], [], [], [], [], []],
+        '09:00': [[], [], [], [], [], [], []],
+        '10:00': [[], [], [], [], [], [], []],
+        '11:00': [[], [], [], [], [], [], []],
         '12:00': [[], [], [], [], [], [], []],
         '13:00': [[{ name: '동호회', type: 'user' }], [{ name: '동호회', type: 'user' }], [], [], [], [], []],
         '14:00': [[], [], [], [], [], [], []],
@@ -45,10 +63,29 @@ const stadiumData = {
         '21:00': [[{ name: '심야풋살', type: 'user' }], [], [{ name: '심야풋살', type: 'user' }], [], [], [], []],
         '22:00': [[{ name: '심야풋살', type: 'user' }], [], [{ name: '심야풋살', type: 'user' }], [], [], [], []],
         '23:00': [[], [], [], [], [], [], []]
+    },
+    '야외3': {
+        '06:00': [[], [], [], [], [], [], []],
+        '07:00': [[], [], [], [], [], [], []],
+        '08:00': [[{ name: '아침운동', type: 'user' }], [{ name: '아침운동', type: 'user' }], [], [], [], [], []],
+        '09:00': [[], [], [], [], [], [], []],
+        '10:00': [[], [], [], [], [], [], []],
+        '11:00': [[], [], [], [], [], [], []],
+        '12:00': [[], [], [], [], [], [], []],
+        '13:00': [[], [], [], [], [], [], []],
+        '14:00': [[], [], [{ name: '주말리그', type: 'user' }], [{ name: '주말리그', type: 'user' }], [], [], []],
+        '15:00': [[], [], [{ name: '주말리그', type: 'user' }], [{ name: '주말리그', type: 'user' }], [], [], []],
+        '16:00': [[], [], [], [], [], [], []],
+        '17:00': [[], [], [], [], [], [], []],
+        '18:00': [[], [], [], [], [], [], []],
+        '19:00': [[{ name: '야외클럽3', type: 'user' }], [], [], [{ name: '야외클럽3', type: 'user' }], [], [], []],
+        '20:00': [[{ name: '야외클럽3', type: 'user' }], [], [], [{ name: '야외클럽3', type: 'user' }], [], [], []],
+        '21:00': [[], [], [], [], [], [], []],
+        '22:00': [[], [], [], [], [], [], []],
+        '23:00': [[], [], [], [], [], [], []]
     }
 };
 
-// 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
     initDynamicWeekCalendar();
     initStadiumTabs();
@@ -56,118 +93,80 @@ document.addEventListener('DOMContentLoaded', function() {
     renderTimetable(currentStadium);
 });
 
-/**
- * 모달 창 내부의 시간 선택 셀렉트 박스 옵션을 12시~23시로 생성
- */
-function initTimeOptions() {
-    const createStart = document.getElementById('create-start');
-    const createEnd = document.getElementById('create-end');
+function filterTime(type, btnElement) {
+    currentTimeFilter = type;
     
-    if (createStart && createEnd) {
-        createStart.innerHTML = '';
-        createEnd.innerHTML = '';
-        
-        for (let i = 12; i <= 23; i++) {
-            const timeStr = `${String(i).padStart(2, '0')}:00`;
-            const nextTimeStr = `${String(i + 1).padStart(2, '0')}:00`;
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => btn.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
 
-            const optStart = document.createElement('option');
-            optStart.value = timeStr;
-            optStart.text = timeStr;
-            createStart.appendChild(optStart);
+    renderTimetable(currentStadium);
+}
 
-            const optEnd = document.createElement('option');
-            optEnd.value = nextTimeStr;
-            optEnd.text = nextTimeStr;
-            createEnd.appendChild(optEnd);
-        }
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🔒';
+    } else {
+        input.type = 'password';
+        btn.innerText = '👁️';
     }
 }
 
-/**
- * 오늘 날짜 기준으로 일주일(7일)의 날짜와 요일을 계산하여 테이블 헤더에 바인딩
- */
-function initDynamicWeekCalendar() {
-    const today = new Date();
-    const dayOfWeekNames = ['일', '월', '화', '수', '목', '금', '토'];
-    
-    weekDates = [];
-    
-    for (let i = 0; i < 7; i++) {
-        const currentDate = new Date();
-        currentDate.setDate(today.getDate() + i);
-        
-        const year = currentDate.getFullYear();
-        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-        const date = String(currentDate.getDate()).padStart(2, '0');
-        const dayName = dayOfWeekNames[currentDate.getDay()];
-        
-        const dateString = `${year}-${month}-${date}`;
-        const displayLabel = `${month}/${date}(${dayName})`;
-        
-        weekDates.push({
-            dateString: dateString,
-            displayLabel: displayLabel,
-            dayName: dayName,
-            isToday: i === 0
-        });
+function showToast(message) {
+    const toast = document.getElementById('toast-message');
+    if (!toast) return;
+
+    toast.innerText = message;
+    toast.classList.add('show');
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2500);
+}
+
+function submitCreate() {
+    const agreeCheck = document.getElementById('create-agree');
+    if (agreeCheck && !agreeCheck.checked) {
+        alert('구장 이용 수칙 및 개인정보 이용에 동의해야 합니다.');
+        return;
     }
 
-    const headerButtons = document.querySelectorAll('.day-header-btn');
-    const createSelect = document.getElementById('create-day');
-    
-    if (createSelect) createSelect.innerHTML = '';
-
-    headerButtons.forEach((btn, index) => {
-        if (weekDates[index]) {
-            const dateInfo = weekDates[index];
-            btn.innerHTML = `${dateInfo.displayLabel} ${dateInfo.isToday ? '<span style="color:#2563eb; font-weight:bold;">[오늘]</span>' : '<span>+신규</span>'}`;
-            btn.setAttribute('onclick', `openCreateModal('${dateInfo.dateString}', '${dateInfo.displayLabel}')`);
-            
-            if (createSelect) {
-                const option = document.createElement('option');
-                option.value = dateInfo.dateString;
-                option.text = dateInfo.displayLabel;
-                createSelect.appendChild(option);
-            }
-        }
-    });
+    closeModal('modal-create');
+    showToast('✓ 신규 예약이 등록되었습니다.');
 }
 
-/**
- * 구장 탭 전환 이벤트
- */
-function initStadiumTabs() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            currentStadium = this.innerText.trim();
-            
-            const stadiumBadge = document.getElementById('create-stadium-badge');
-            if (stadiumBadge) stadiumBadge.innerText = currentStadium;
-
-            renderTimetable(currentStadium);
-        });
-    });
+function submitEdit() {
+    closeModal('modal-edit');
+    showToast('✓ 예약 정보가 수정되었습니다.');
 }
 
-/**
- * 12:00 ~ 23:00 시간대 타임테이블 동적 렌더링
- */
+function submitDelete() {
+    closeModal('modal-edit');
+    showToast('✓ 예약이 취소(삭제)되었습니다.');
+}
+
 function renderTimetable(stadiumName) {
     const tbody = document.getElementById('timetable-body');
     if (!tbody) return;
 
     const data = stadiumData[stadiumName] || {};
-    // 12시부터 23시까지 시간 목록 생성
-    const times = Array.from({ length: 12 }, (_, i) => `${String(i + 12).padStart(2, '0')}:00`);
+    let allTimes = Array.from({ length: 18 }, (_, i) => `${String(i + 6).padStart(2, '0')}:00`);
+
+    if (currentTimeFilter === 'morning') {
+        allTimes = allTimes.filter(t => parseInt(t) >= 6 && parseInt(t) <= 11);
+    } else if (currentTimeFilter === 'afternoon') {
+        allTimes = allTimes.filter(t => parseInt(t) >= 12 && parseInt(t) <= 17);
+    } else if (currentTimeFilter === 'night') {
+        allTimes = allTimes.filter(t => parseInt(t) >= 18 && parseInt(t) <= 23);
+    }
+
     let html = '';
 
-    times.forEach(time => {
+    allTimes.forEach(time => {
         html += `<tr>`;
         html += `<td class="time-col">${time}</td>`;
 
@@ -193,9 +192,89 @@ function renderTimetable(stadiumName) {
     tbody.innerHTML = html;
 }
 
-/**
- * [신규] 예약 모달 켜기
- */
+function initDynamicWeekCalendar() {
+    const today = new Date();
+    const dayOfWeekNames = ['일', '월', '화', '수', '목', '금', '토'];
+    weekDates = [];
+    
+    for (let i = 0; i < 7; i++) {
+        const currentDate = new Date();
+        currentDate.setDate(today.getDate() + i);
+        
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+        const date = String(currentDate.getDate()).padStart(2, '0');
+        const dayName = dayOfWeekNames[currentDate.getDay()];
+        
+        const dateString = `${year}-${month}-${date}`;
+        const displayLabel = `${month}/${date}(${dayName})`;
+        
+        weekDates.push({ dateString, displayLabel, dayName, isToday: i === 0 });
+    }
+
+    const headerButtons = document.querySelectorAll('.day-header-btn');
+    const createSelect = document.getElementById('create-day');
+    
+    if (createSelect) createSelect.innerHTML = '';
+
+    headerButtons.forEach((btn, index) => {
+        if (weekDates[index]) {
+            const dateInfo = weekDates[index];
+            btn.innerHTML = `${dateInfo.displayLabel} ${dateInfo.isToday ? '<span style="color:#2563eb; font-weight:bold;">[오늘]</span>' : '<span>+신규</span>'}`;
+            btn.setAttribute('onclick', `openCreateModal('${dateInfo.dateString}', '${dateInfo.displayLabel}')`);
+            
+            if (createSelect) {
+                const option = document.createElement('option');
+                option.value = dateInfo.dateString;
+                option.text = dateInfo.displayLabel;
+                createSelect.appendChild(option);
+            }
+        }
+    });
+}
+
+function initStadiumTabs() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            currentStadium = this.innerText.trim();
+            
+            const stadiumBadge = document.getElementById('create-stadium-badge');
+            if (stadiumBadge) stadiumBadge.innerText = currentStadium;
+
+            renderTimetable(currentStadium);
+        });
+    });
+}
+
+function initTimeOptions() {
+    const createStart = document.getElementById('create-start');
+    const createEnd = document.getElementById('create-end');
+    
+    if (createStart && createEnd) {
+        createStart.innerHTML = '';
+        createEnd.innerHTML = '';
+        
+        for (let i = 6; i <= 23; i++) {
+            const timeStr = `${String(i).padStart(2, '0')}:00`;
+            const nextTimeStr = `${String(i + 1).padStart(2, '0')}:00`;
+
+            const optStart = document.createElement('option');
+            optStart.value = timeStr;
+            optStart.text = timeStr;
+            createStart.appendChild(optStart);
+
+            const optEnd = document.createElement('option');
+            optEnd.value = nextTimeStr;
+            optEnd.text = nextTimeStr;
+            createEnd.appendChild(optEnd);
+        }
+    }
+}
+
 function openCreateModal(dateString, displayLabel) {
     const daySelect = document.getElementById('create-day');
     if (daySelect) daySelect.value = dateString;
@@ -209,9 +288,6 @@ function openCreateModal(dateString, displayLabel) {
     if (modal) modal.classList.add('active');
 }
 
-/**
- * [수정/삭제] 예약 모달 켜기
- */
 function openEditModal(userName, startTime, endTime) {
     const idInput = document.getElementById('edit-id');
     if (idInput) idInput.value = `${userName} (010-****-5678)`;
@@ -226,23 +302,16 @@ function openEditModal(userName, startTime, endTime) {
     if (modal) modal.classList.add('active');
 }
 
-/**
- * 모달 닫기
- */
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.remove('active');
 }
 
-/**
- * 신규 모달 내 날짜 배지 업데이트
- */
 function updateBadge(displayLabel) {
     const badge = document.getElementById('create-day-badge');
     if (badge) badge.innerText = displayLabel;
 }
 
-// 모달 바깥 배경 클릭 시 닫기
 window.addEventListener('click', function(event) {
     if (event.target.classList.contains('modal-overlay')) {
         event.target.classList.remove('active');
