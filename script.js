@@ -116,6 +116,7 @@ function togglePasswordVisibility(inputId, btn) {
     }
 }
 
+// 3. TOAST 메시지 출력 함수
 function showToast(message) {
     const toast = document.getElementById('toast-message');
     if (!toast) return;
@@ -128,6 +129,7 @@ function showToast(message) {
     }, 2500);
 }
 
+// 신규 예약 저장 처리
 function submitCreate() {
     const agreeCheck = document.getElementById('create-agree');
     if (agreeCheck && !agreeCheck.checked) {
@@ -136,17 +138,19 @@ function submitCreate() {
     }
 
     closeModal('modal-create');
-    showToast('✓ 신규 예약이 등록되었습니다.');
+    showToast('✓ 신규 예약이 성공적으로 등록되었습니다.');
 }
 
+// 예약 수정 처리
 function submitEdit() {
     closeModal('modal-edit');
-    showToast('✓ 예약 정보가 수정되었습니다.');
+    showToast('✏️ 예약 정보가 수정되었습니다.');
 }
 
+// 예약 삭제(취소) 처리
 function submitDelete() {
     closeModal('modal-edit');
-    showToast('✓ 예약이 취소(삭제)되었습니다.');
+    showToast('🗑️ 예약이 삭제(취소)되었습니다.');
 }
 
 function renderTimetable(stadiumName) {
