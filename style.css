@@ -173,22 +173,24 @@ body {
 
 .toast {
     position: fixed;
-    bottom: 20px;
+    top: 20px; /* 화면 하단(bottom)에서 상단(top)으로 변경 */
     left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: rgba(15, 23, 42, 0.9);
+    transform: translateX(-50%) translateY(-100px); /* 위쪽으로 숨겨둠 */
+    background: rgba(15, 23, 42, 0.92);
     color: white;
-    padding: 10px 18px;
+    padding: 10px 20px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     z-index: 9999;
     opacity: 0;
-    transition: all 0.3s ease;
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 부드럽게 위에서 내려오는 효과 */
+    white-space: nowrap;
 }
+
 .toast.show {
-    transform: translateX(-50%) translateY(0);
+    transform: translateX(-50%) translateY(0); /* 상단 20px 위치로 내려옴 */
     opacity: 1;
 }
 
