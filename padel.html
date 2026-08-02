@@ -29,7 +29,7 @@
         </div>
     </details>
 
-    <!-- STADIUM TABS (4개 구장으로 변경) -->
+    <!-- STADIUM TABS -->
     <div class="tabs">
         <button class="tab-btn active">실내</button>
         <button class="tab-btn">야외1</button>
@@ -37,12 +37,14 @@
         <button class="tab-btn">야외3</button>
     </div>
 
-    <!-- TIME FILTER BUTTONS -->
+    <!-- TIME FILTER BUTTONS (요청하신 5개 세분화 시간대) -->
     <div class="time-filter-container">
         <button class="filter-btn active" onclick="filterTime('all', this)">전체</button>
-        <button class="filter-btn" onclick="filterTime('morning', this)">🌅 오전 (06~11시)</button>
-        <button class="filter-btn" onclick="filterTime('afternoon', this)">☀️ 오후 (12~17시)</button>
-        <button class="filter-btn" onclick="filterTime('night', this)">🌙 야간 (18~23시)</button>
+        <button class="filter-btn" onclick="filterTime('t06_11', this)">06~11시</button>
+        <button class="filter-btn" onclick="filterTime('t09_14', this)">09~14시</button>
+        <button class="filter-btn" onclick="filterTime('t12_17', this)">12~17시</button>
+        <button class="filter-btn" onclick="filterTime('t15_20', this)">15~20시</button>
+        <button class="filter-btn" onclick="filterTime('t18_23', this)">18~23시</button>
     </div>
 
     <!-- TIMETABLE -->

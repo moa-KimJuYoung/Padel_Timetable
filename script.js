@@ -1,8 +1,8 @@
 let currentStadium = '실내';
-let currentTimeFilter = 'all'; // 'all', 'morning', 'afternoon', 'night'
+let currentTimeFilter = 'all'; // 'all', 't06_11', 't09_14', 't12_17', 't15_20', 't18_23'
 let weekDates = [];
 
-// [예시 데이터] 실내, 야외1, 야외2, 야외3 4개 구장 매핑
+// [예시 데이터] 06:00 ~ 23:00
 const stadiumData = {
     '실내': {
         '06:00': [[{ name: '실내조기회', type: 'user' }], [], [], [], [], [], []],
@@ -116,7 +116,6 @@ function togglePasswordVisibility(inputId, btn) {
     }
 }
 
-// 3. TOAST 메시지 출력 함수
 function showToast(message) {
     const toast = document.getElementById('toast-message');
     if (!toast) return;
@@ -129,7 +128,6 @@ function showToast(message) {
     }, 2500);
 }
 
-// 신규 예약 저장 처리
 function submitCreate() {
     const agreeCheck = document.getElementById('create-agree');
     if (agreeCheck && !agreeCheck.checked) {
@@ -141,18 +139,17 @@ function submitCreate() {
     showToast('✓ 신규 예약이 성공적으로 등록되었습니다.');
 }
 
-// 예약 수정 처리
 function submitEdit() {
     closeModal('modal-edit');
     showToast('✏️ 예약 정보가 수정되었습니다.');
 }
 
-// 예약 삭제(취소) 처리
 function submitDelete() {
     closeModal('modal-edit');
     showToast('🗑️ 예약이 삭제(취소)되었습니다.');
 }
 
+// 🌟 요청하신 5개 세분화 필터 조건식 구현
 function renderTimetable(stadiumName) {
     const tbody = document.getElementById('timetable-body');
     if (!tbody) return;
@@ -160,24 +157,54 @@ function renderTimetable(stadiumName) {
     const data = stadiumData[stadiumName] || {};
     let allTimes = Array.from({ length: 18 }, (_, i) => `${String(i + 6).padStart(2, '0')}:00`);
 
-    if (currentTimeFilter === 'morning') {
+    // 5단계 필터 세분화
+    if (currentTimeFilter === 't06_11') {
         allTimes = allTimes.filter(t => parseInt(t) >= 6 && parseInt(t) <= 11);
-    } else if (currentTimeFilter === 'afternoon') {
+    } else if (currentTimeFilter === 't09_14') {
+        allTimes = allTimes.filter(t => parseInt(t) >= 9 && parseInt(t) <= 14);
+    } else if (currentTimeFilter === 't12_17') {
         allTimes = allTimes.filter(t => parseInt(t) >= 12 && parseInt(t) <= 17);
-    } else if (currentTimeFilter === 'night') {
+    } else if (currentTimeFilter === 't15_20') {
+        allTimes = allTimes.filter(t => parseInt(t) >= 15 && parseInt(t) <= 20);
+    } else if (currentTimeFilter === 't18_23') {
         allTimes = allTimes.filter(t => parseInt(t) >= 18 && parseInt(t) <= 23);
     }
+
+    const now = new Date();
+    const currentHour = now.getHours();
 
     let html = '';
 
     allTimes.forEach(time => {
+        const rowHour = parseInt(time.split(':')[0]);
+        let badgeHtml = '';
+
+        if (rowHour < currentHour) {
+            badgeHtml = '<span class="past-badge">🔚종료</span>';
+        } else if (rowHour === currentHour) {
+            badgeHtml = '<span class="live-badge">🟢LIVE</span>';
+        }
+
         html += `<tr>`;
-        html += `<td class="time-col">${time}</td>`;
+        html += `<td class="time-col">${time}${badgeHtml}</td>`;
 
         const dayList = data[time] || [[], [], [], [], [], [], []];
 
-        dayList.forEach((cellItems) => {
-            html += `<td><div class="cell-content">`;
+        dayList.forEach((cellItems, dayIndex) => {
+            let todayStatusClass = '';
+
+            // 첫 번째 열(오늘)만 3가지 시각 상태 적용
+            if (dayIndex === 0) {
+                if (rowHour < currentHour) {
+                    todayStatusClass = 'today-past';   // 지나간 시간
+                } else if (rowHour === currentHour) {
+                    todayStatusClass = 'today-live';   // 현재 시간 (LIVE)
+                } else {
+                    todayStatusClass = 'today-future'; // 예정된 시간
+                }
+            }
+
+            html += `<td class="${todayStatusClass}"><div class="cell-content">`;
             
             cellItems.forEach(item => {
                 if (item.type === 'user') {
@@ -217,6 +244,7 @@ function initDynamicWeekCalendar() {
     }
 
     const headerButtons = document.querySelectorAll('.day-header-btn');
+    const thElements = document.querySelectorAll('.timetable thead th');
     const createSelect = document.getElementById('create-day');
     
     if (createSelect) createSelect.innerHTML = '';
@@ -224,7 +252,13 @@ function initDynamicWeekCalendar() {
     headerButtons.forEach((btn, index) => {
         if (weekDates[index]) {
             const dateInfo = weekDates[index];
-            btn.innerHTML = `${dateInfo.displayLabel} ${dateInfo.isToday ? '<span style="color:#2563eb; font-weight:bold;">[오늘]</span>' : '<span>+신규</span>'}`;
+            
+            if (dateInfo.isToday) {
+                btn.classList.add('today-btn');
+                if (thElements[index + 1]) thElements[index + 1].classList.add('today-header');
+            }
+
+            btn.innerHTML = `${dateInfo.displayLabel} ${dateInfo.isToday ? '<span style="color:#0284c7; font-weight:bold;">[오늘]</span>' : '<span>+신규</span>'}`;
             btn.setAttribute('onclick', `openCreateModal('${dateInfo.dateString}', '${dateInfo.displayLabel}')`);
             
             if (createSelect) {
