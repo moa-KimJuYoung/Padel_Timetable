@@ -22,9 +22,14 @@ function fetchSheetData() {
         .then(data => {
             // 📢 1) 공지사항 반영
             const noticeArea = document.getElementById('notice-display-area');
-            if (noticeArea && data.notice) {
-                noticeArea.innerText = data.notice;
-            }
+            if (noticeArea && data.notices && data.notices.length > 0) {
+                // 여러 줄의 공지사항을 줄바꿈/불릿 기호로 묶어서 표시
+                noticeArea.innerHTML = data.notices.map(notice => `<div>📢 ${notice}</div>`).join('');
+            }            
+            // const noticeArea = document.getElementById('notice-display-area');
+            // if (noticeArea && data.notice) {
+            //     noticeArea.innerText = data.notice;
+            // }
 
             // 📅 2) 예약 데이터 변환 및 타임테이블 렌더링
             rawReservationsList = data.reservations || [];
