@@ -3,101 +3,148 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIhU4Fn_PUxt
 let currentStadium = '실내';
 let currentTimeFilter = 'all'; // 'all', 't06_11', 't09_14', 't12_17', 't15_20', 't18_23'
 let weekDates = [];
-
-// [예시 데이터] 06:00 ~ 23:00
-const stadiumData = {
-    '실내': {
-        '06:00': [[{ name: '실내조기회', type: 'user' }], [], [], [], [], [], []],
-        '07:00': [[{ name: '실내조기회', type: 'user' }], [], [], [], [], [], []],
-        '08:00': [[], [], [], [], [], [], []],
-        '09:00': [[], [{ name: '모닝레슨', type: 'lesson' }], [], [], [], [], []],
-        '10:00': [[], [{ name: '모닝레슨', type: 'lesson' }], [], [], [], [], []],
-        '11:00': [[], [], [], [], [], [], []],
-        '12:00': [[{ name: '점심팀', type: 'user' }], [], [], [], [], [], []],
-        '13:00': [[], [], [{ name: '직장인A', type: 'user' }], [], [], [], []],
-        '14:00': [[], [], [], [], [], [{ name: '주말클럽', type: 'user' }], []],
-        '15:00': [[], [], [], [], [], [{ name: '주말클럽', type: 'user' }], []],
-        '16:00': [[], [{ name: '유소년반', type: 'lesson' }], [], [], [], [], []],
-        '17:00': [[{ name: 'A회원', type: 'user' }, { name: 'B회원', type: 'user' }], [{ name: 'B회원', type: 'user' }], [], [{ name: '강습', type: 'lesson' }], [], [{ name: 'B회원', type: 'user' }], []],
-        '18:00': [[{ name: 'A회원', type: 'user' }], [{ name: 'B회원', type: 'user' }], [], [{ name: '강습', type: 'lesson' }], [], [], []],
-        '19:00': [[{ name: 'A회원', type: 'user' }, { name: 'C회원', type: 'user' }], [{ name: '강습', type: 'lesson' }], [], [{ name: '강습', type: 'lesson' }], [], [], []],
-        '20:00': [[{ name: 'A회원', type: 'user' }], [], [], [{ name: '강습', type: 'lesson' }], [], [], []],
-        '21:00': [[], [], [{ name: '심야클럽', type: 'user' }], [], [{ name: '불금팀', type: 'user' }], [], []],
-        '22:00': [[], [], [{ name: '심야클럽', type: 'user' }], [], [{ name: '불금팀', type: 'user' }], [], []],
-        '23:00': [[], [], [], [], [], [], []]
-    },
-    '야외1': {
-        '06:00': [[], [], [], [], [], [], []],
-        '07:00': [[], [], [], [], [], [], []],
-        '08:00': [[], [], [], [], [], [], []],
-        '09:00': [[], [], [], [], [], [], []],
-        '10:00': [[{ name: '시니어반', type: 'lesson' }], [], [{ name: '시니어반', type: 'lesson' }], [], [], [], []],
-        '11:00': [[{ name: '시니어반', type: 'lesson' }], [], [{ name: '시니어반', type: 'lesson' }], [], [], [], []],
-        '12:00': [[], [], [], [], [], [], []],
-        '13:00': [[], [], [], [], [], [], []],
-        '14:00': [[], [{ name: '오후반', type: 'lesson' }], [], [{ name: '오후반', type: 'lesson' }], [], [], []],
-        '15:00': [[], [{ name: '오후반', type: 'lesson' }], [], [{ name: '오후반', type: 'lesson' }], [], [], []],
-        '16:00': [[], [], [], [], [], [], []],
-        '17:00': [[], [{ name: '김철수', type: 'user' }], [{ name: '강습', type: 'lesson' }], [], [{ name: '이영희', type: 'user' }], [], []],
-        '18:00': [[{ name: '강습', type: 'lesson' }], [{ name: '김철수', type: 'user' }], [{ name: '강습', type: 'lesson' }], [], [{ name: '이영희', type: 'user' }], [], []],
-        '19:00': [[{ name: 'FC유나이티드', type: 'user' }], [], [{ name: 'FC유나이티드', type: 'user' }], [{ name: '최동원', type: 'user' }], [], [{ name: '강습', type: 'lesson' }], []],
-        '20:00': [[{ name: 'FC유나이티드', type: 'user' }], [], [{ name: 'FC유나이티드', type: 'user' }], [], [], [{ name: '강습', type: 'lesson' }], []],
-        '21:00': [[], [], [], [{ name: '나이트팀', type: 'user' }], [], [], []],
-        '22:00': [[], [], [], [{ name: '나이트팀', type: 'user' }], [], [], []],
-        '23:00': [[], [], [], [], [], [], []]
-    },
-    '야외2': {
-        '06:00': [[], [], [], [], [], [], []],
-        '07:00': [[], [], [], [], [], [], []],
-        '08:00': [[], [], [], [], [], [], []],
-        '09:00': [[], [], [], [], [], [], []],
-        '10:00': [[], [], [], [], [], [], []],
-        '11:00': [[], [], [], [], [], [], []],
-        '12:00': [[], [], [], [], [], [], []],
-        '13:00': [[{ name: '동호회', type: 'user' }], [{ name: '동호회', type: 'user' }], [], [], [], [], []],
-        '14:00': [[], [], [], [], [], [], []],
-        '15:00': [[], [], [], [], [], [], []],
-        '16:00': [[], [], [], [], [], [], []],
-        '17:00': [[{ name: '유소년클럽', type: 'lesson' }], [{ name: '유소년클럽', type: 'lesson' }], [{ name: '유소년클럽', type: 'lesson' }], [{ name: '유소년클럽', type: 'lesson' }], [{ name: '유소년클럽', type: 'lesson' }], [], []],
-        '18:00': [[{ name: '유소년클럽', type: 'lesson' }], [{ name: '유소년클럽', type: 'lesson' }], [{ name: '유소년클럽', type: 'lesson' }], [{ name: '유소년클럽', type: 'lesson' }], [{ name: '유소년클럽', type: 'lesson' }], [{ name: '홍길동', type: 'user' }], [{ name: '홍길동', type: 'user' }]],
-        '19:00': [[], [], [{ name: '야간조기회', type: 'user' }], [{ name: '야간조기회', type: 'user' }], [{ name: '야간조기회', type: 'user' }], [{ name: '정약용', type: 'user' }], []],
-        '20:00': [[], [], [{ name: '야간조기회', type: 'user' }], [{ name: '야간조기회', type: 'user' }], [{ name: '야간조기회', type: 'user' }], [], []],
-        '21:00': [[{ name: '심야풋살', type: 'user' }], [], [{ name: '심야풋살', type: 'user' }], [], [], [], []],
-        '22:00': [[{ name: '심야풋살', type: 'user' }], [], [{ name: '심야풋살', type: 'user' }], [], [], [], []],
-        '23:00': [[], [], [], [], [], [], []]
-    },
-    '야외3': {
-        '06:00': [[], [], [], [], [], [], []],
-        '07:00': [[], [], [], [], [], [], []],
-        '08:00': [[{ name: '아침운동', type: 'user' }], [{ name: '아침운동', type: 'user' }], [], [], [], [], []],
-        '09:00': [[], [], [], [], [], [], []],
-        '10:00': [[], [], [], [], [], [], []],
-        '11:00': [[], [], [], [], [], [], []],
-        '12:00': [[], [], [], [], [], [], []],
-        '13:00': [[], [], [], [], [], [], []],
-        '14:00': [[], [], [{ name: '주말리그', type: 'user' }], [{ name: '주말리그', type: 'user' }], [], [], []],
-        '15:00': [[], [], [{ name: '주말리그', type: 'user' }], [{ name: '주말리그', type: 'user' }], [], [], []],
-        '16:00': [[], [], [], [], [], [], []],
-        '17:00': [[], [], [], [], [], [], []],
-        '18:00': [[], [], [], [], [], [], []],
-        '19:00': [[{ name: '야외클럽3', type: 'user' }], [], [], [{ name: '야외클럽3', type: 'user' }], [], [], []],
-        '20:00': [[{ name: '야외클럽3', type: 'user' }], [], [], [{ name: '야외클럽3', type: 'user' }], [], [], []],
-        '21:00': [[], [], [], [], [], [], []],
-        '22:00': [[], [], [], [], [], [], []],
-        '23:00': [[], [], [], [], [], [], []]
-    }
-};
+let rawReservationsList = []; // 시트에서 가져온 원본 예약 데이터
+let stadiumData = {};         // 타임테이블 렌더링용 변환 데이터
 
 document.addEventListener('DOMContentLoaded', function() {
     initDynamicWeekCalendar();
     initStadiumTabs();
     initTimeOptions();
-    renderTimetable(currentStadium);
+    fetchSheetData(); // 🚀 구글 시트에서 실시간 데이터 불러오기
 });
 
+// =========================================================
+// 1. 구글 스프레드시트 데이터 연동 (조회)
+// =========================================================
+function fetchSheetData() {
+    fetch(GOOGLE_SCRIPT_URL)
+        .then(response => response.json())
+        .then(data => {
+            // 📢 1) 공지사항 반영
+            const noticeArea = document.getElementById('notice-display-area');
+            if (noticeArea && data.notice) {
+                noticeArea.innerText = data.notice;
+            }
+
+            // 📅 2) 예약 데이터 변환 및 타임테이블 렌더링
+            rawReservationsList = data.reservations || [];
+            parseSheetData(rawReservationsList);
+            renderTimetable(currentStadium);
+        })
+        .catch(error => {
+            console.error('Data Fetch Error:', error);
+            showToast('❌ 데이터를 불러오는데 실패했습니다.');
+            renderTimetable(currentStadium);
+        });
+}
+
+// 시트 배열 데이터를 타임테이블 구조로 변환
+function parseSheetData(rows) {
+    stadiumData = { '실내': {}, '야외1': {}, '야외2': {}, '야외3': {} };
+
+    rows.forEach(row => {
+        // [날짜, 구장, 시간, 사용자명, 등록일시]
+        const [date, stadium, time, name] = row;
+        if (!stadiumData[stadium]) stadiumData[stadium] = {};
+        if (!stadiumData[stadium][time]) {
+            stadiumData[stadium][time] = [[], [], [], [], [], [], []];
+        }
+
+        // 현재 7일 달력 중 일치하는 요일 인덱스(0~6) 찾기
+        const dayIndex = weekDates.findIndex(d => d.dateString === date);
+        if (dayIndex !== -1) {
+            stadiumData[stadium][time][dayIndex].push({
+                name: name,
+                date: date,
+                time: time,
+                stadium: stadium,
+                type: 'user'
+            });
+        }
+    });
+}
+
+// =========================================================
+// 2. 예약 생성 / 삭제 (POST 요청)
+// =========================================================
+function submitCreate() {
+    const agreeCheck = document.getElementById('create-agree');
+    if (agreeCheck && !agreeCheck.checked) {
+        alert('구장 이용 수칙 및 개인정보 이용에 동의해야 합니다.');
+        return;
+    }
+
+    const name = document.getElementById('create-id').value.trim();
+    const pw = document.getElementById('create-pw').value.trim();
+    const date = document.getElementById('create-day').value;
+    const time = document.getElementById('create-start').value;
+
+    if (!name || !pw) {
+        alert('사용자 이름과 비밀번호를 모두 입력해 주세요.');
+        return;
+    }
+
+    const payload = {
+        action: 'create',
+        date: date,
+        stadium: currentStadium,
+        time: time,
+        id: name,
+        pw: pw
+    };
+
+    sendToGoogleSheet(payload, 'modal-create', '✓ 신규 예약이 성공적으로 등록되었습니다.');
+}
+
+function submitDelete() {
+    const name = document.getElementById('edit-id').value.trim();
+    const pw = document.getElementById('edit-pw').value.trim();
+    const time = document.getElementById('edit-start-opt').value;
+    const date = weekDates[0].dateString; // 선택된 날짜 기준
+
+    if (!pw) {
+        alert('사용자 비밀번호를 입력해 주세요.');
+        return;
+    }
+
+    const payload = {
+        action: 'delete',
+        date: date,
+        stadium: currentStadium,
+        time: time,
+        id: name,
+        pw: pw
+    };
+
+    sendToGoogleSheet(payload, 'modal-edit', '🗑️ 예약이 삭제(취소)되었습니다.');
+}
+
+function sendToGoogleSheet(payload, modalId, successMessage) {
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.text())
+    .then(result => {
+        if (result === 'auth_failed') {
+            alert('🔒 비밀번호가 일치하지 않습니다.\n(최초 등록한 본인 비밀번호를 입력해 주세요)');
+        } else {
+            closeModal(modalId);
+            showToast(successMessage);
+            fetchSheetData(); // 시트 변경 즉시 화면 재갱신
+        }
+    })
+    .catch(err => {
+        console.error('Submit Error:', err);
+        showToast('❌ 처리 중 오류가 발생했습니다.');
+    });
+}
+
+// =========================================================
+// 3. UI 렌더링 및 모달 제어
+// =========================================================
 function filterTime(type, btnElement) {
     currentTimeFilter = type;
-    
     const filterBtns = document.querySelectorAll('.filter-btn');
     filterBtns.forEach(btn => btn.classList.remove('active'));
     if (btnElement) btnElement.classList.add('active');
@@ -130,28 +177,6 @@ function showToast(message) {
     }, 2500);
 }
 
-function submitCreate() {
-    const agreeCheck = document.getElementById('create-agree');
-    if (agreeCheck && !agreeCheck.checked) {
-        alert('구장 이용 수칙 및 개인정보 이용에 동의해야 합니다.');
-        return;
-    }
-
-    closeModal('modal-create');
-    showToast('✓ 신규 예약이 성공적으로 등록되었습니다.');
-}
-
-function submitEdit() {
-    closeModal('modal-edit');
-    showToast('✏️ 예약 정보가 수정되었습니다.');
-}
-
-function submitDelete() {
-    closeModal('modal-edit');
-    showToast('🗑️ 예약이 삭제(취소)되었습니다.');
-}
-
-// 🌟 요청하신 5개 세분화 필터 조건식 구현
 function renderTimetable(stadiumName) {
     const tbody = document.getElementById('timetable-body');
     if (!tbody) return;
@@ -159,7 +184,6 @@ function renderTimetable(stadiumName) {
     const data = stadiumData[stadiumName] || {};
     let allTimes = Array.from({ length: 18 }, (_, i) => `${String(i + 6).padStart(2, '0')}:00`);
 
-    // 5단계 필터 세분화
     if (currentTimeFilter === 't06_11') {
         allTimes = allTimes.filter(t => parseInt(t) >= 6 && parseInt(t) <= 11);
     } else if (currentTimeFilter === 't09_14') {
@@ -195,25 +219,20 @@ function renderTimetable(stadiumName) {
         dayList.forEach((cellItems, dayIndex) => {
             let todayStatusClass = '';
 
-            // 첫 번째 열(오늘)만 3가지 시각 상태 적용
             if (dayIndex === 0) {
                 if (rowHour < currentHour) {
-                    todayStatusClass = 'today-past';   // 지나간 시간
+                    todayStatusClass = 'today-past';
                 } else if (rowHour === currentHour) {
-                    todayStatusClass = 'today-live';   // 현재 시간 (LIVE)
+                    todayStatusClass = 'today-live';
                 } else {
-                    todayStatusClass = 'today-future'; // 예정된 시간
+                    todayStatusClass = 'today-future';
                 }
             }
 
             html += `<td class="${todayStatusClass}"><div class="cell-content">`;
             
             cellItems.forEach(item => {
-                if (item.type === 'user') {
-                    html += `<span class="user-tag" onclick="openEditModal('${item.name}', '${time}', '')">${item.name}</span>`;
-                } else if (item.type === 'lesson') {
-                    html += `<span class="lesson-tag">${item.name}</span>`;
-                }
+                html += `<span class="user-tag" onclick="openEditModal('${item.name}', '${time}')">${item.name}</span>`;
             });
 
             html += `</div></td>`;
@@ -324,13 +343,20 @@ function openCreateModal(dateString, displayLabel) {
     const stadiumBadge = document.getElementById('create-stadium-badge');
     if (stadiumBadge) stadiumBadge.innerText = currentStadium;
 
+    // 입력 필드 초기화
+    document.getElementById('create-id').value = '';
+    document.getElementById('create-pw').value = '';
+
     const modal = document.getElementById('modal-create');
     if (modal) modal.classList.add('active');
 }
 
-function openEditModal(userName, startTime, endTime) {
+function openEditModal(userName, startTime) {
     const idInput = document.getElementById('edit-id');
-    if (idInput) idInput.value = `${userName} (010-****-5678)`;
+    if (idInput) idInput.value = userName;
+
+    const pwInput = document.getElementById('edit-pw');
+    if (pwInput) pwInput.value = '';
 
     const startOpt = document.getElementById('edit-start-opt');
     if (startOpt) {
