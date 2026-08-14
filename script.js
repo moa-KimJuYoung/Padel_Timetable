@@ -1,3 +1,5 @@
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIhU4Fn_PUxtCv3Nzi7b4J7lGfeXqUJgeJutLfDQvC4JRkcTjfFkps3Syp6yjv3pYs/exec';
+
 let currentStadium = '실내';
 let currentTimeFilter = 'all'; // 'all', 't06_11', 't09_14', 't12_17', 't15_20', 't18_23'
 let weekDates = [];
